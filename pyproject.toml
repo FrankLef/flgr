@@ -1,0 +1,76 @@
+[project]
+name = "flgr"
+# NOTE: conflict name for 'version', must use specific jinja syntax to resolve.
+version = "0.1.0"
+description = "Ephel graphics"
+authors = [
+    { name = "François Lefebvre", email = "flefebvre01@hotmail.com" },
+]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "polars>=1.42.0",
+    "numpy>=2.3.4",
+    "great-tables>=0.23.0",
+    "openpyxl>=3.1.5",
+    "SQLAlchemy>=2.0.0",
+    "sqlalchemy-access>=2.0.2",
+    "sqlalchemy-utils>=0.42.1",
+    "pyodbc>=5.3.0",
+    "dynaconf>=3.1.11",
+    "rich>=15.0.0",
+    "typer>=0.26.0",
+    "duckdb>=1.5.2",
+]
+# source: https://browniebroke.com/blog/convert-existing-poetry-to-src-layout/
+packages = [{ include = "flgr", from = "src" }]
+
+
+[project.urls]
+homepage = "https://github.com/FrankLef/flgr.git"
+repository = "https://github.com/FrankLef/flgr.git"
+Changelog = "https://github.com/FrankLef/flgr.git/releases"
+
+# [tool.poetry.dependencies]
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.6.0"
+pre-commit-hooks = "^5.0.0"
+pytest = "^9.0.0"
+mypy = "^0.971"
+typeguard = "^2.13.3"
+mkdocs = "^1.5.3"
+mkdocstrings = "^0.19.0"
+mkdocs-material = "^8.5.4"
+mkdocstrings-python = "^0.7.1"
+ipykernel = "^6.29.5"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
+# source: https://browniebroke.com/blog/convert-existing-poetry-to-src-layout/
+pythonpath = ["src"]
+testpaths = ["tests", "integration"]
+
+[tool.ruff]
+# force-exclude tells Ruff to ignore this file even if the VS Code editor explicitly passes it. Personal note: Not sure this work! What works is the '"ruff.exclude"' line in the user settings.json.
+force-exclude = true
+# source https://blog.jerrycodes.com/ruff-the-python-linter/
+# use this option if you want 'strict' style which is a bit too much
+# select = ["ALL"]
+extend-include = ["*.ipynb"]
+
+
+# https://mypy.readthedocs.io/en/stable/config_file.html#config-file
+# https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
+[tool.mypy]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["ruamel.yaml", "io", "dynaconf"]
+ignore_missing_imports = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
