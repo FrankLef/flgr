@@ -27,9 +27,10 @@ class PlyFacetsTims(Ply):
         self.label_base_var = label_base_var
 
     def execute(self) -> None:
-        self.fig = self.create_base()
+        self.create_base()
+        self.add_titles()
 
-    def create_base(self) -> go.Figure:
+    def create_base(self) -> None:
         TEXTFONT: Final[dict[str, Any]] = {"color": "navy", "size": 12}
         # MARKER_SIZE: Final[int] = 6
 
@@ -37,7 +38,7 @@ class PlyFacetsTims(Ply):
         group_var = self.group_var
         period_var = self.period_var
         ybase_var = self.ybase_var
-        ewm_var = self.yewm_var
+        yewm_var = self.yewm_var
         label_base_var = self.label_base_var
 
         groups = data[group_var].unique(maintain_order=True).to_list()
@@ -46,17 +47,17 @@ class PlyFacetsTims(Ply):
         fig = make_subplots(
             rows=ngroups,
             cols=1,
-            # subplot_titles=concept_labels,
+            subplot_titles=groups,
             shared_xaxes=True,
             vertical_spacing=0.10,
         )
 
         for nrow, group in enumerate(groups, start=1):
-            df = data.filter(pl.col(group))
+            df = data.filter(pl.col(group_var).eq(group))
             fig.add_trace(
                 go.Scatter(
                     x=df[period_var],
-                    y=df[ewm_var],
+                    y=df[yewm_var],
                     mode="lines",
                     # line=dict(
                     #     color=concept_color,
@@ -69,10 +70,10 @@ class PlyFacetsTims(Ply):
             )
             fig.add_trace(
                 go.Scatter(
-                    x=data[period_var],
-                    y=data[ybase_var],
+                    x=df[period_var],
+                    y=df[ybase_var],
                     mode="markers+text",
-                    text="<i>" + data[label_base_var] + "</i>",
+                    text="<i>" + df[label_base_var] + "</i>",
                     textposition="top right",
                     textfont_size=TEXTFONT["size"],
                     textfont=dict(color=TEXTFONT["color"]),
@@ -84,5 +85,15 @@ class PlyFacetsTims(Ply):
                 row=nrow,
                 col=1,
             )
-        fig.update_layout(showlegend=False)
-        return fig
+        fig.update_layout(template="none")
+        self.fig = fig
+
+    def add_titles(self) -> None:
+        a_title = self.title
+        a_subtitle = self.subtitle
+        self.fig.update_layout(
+            title=dict(text=a_title, subtitle=dict(text=a_subtitle)),
+        )
+
+    def template(self, templ: go.layout.Template) -> None:
+        self.fig.update_layout(template=templ)
