@@ -1,4 +1,5 @@
 import itertools
+from typing import Self
 import polars as pl
 import plotly.graph_objects as go
 from pypalettes import load_palette
@@ -27,19 +28,23 @@ class PlyGroupsTims(Ply):
         self.set_line()
         self.set_textfont()
 
-    def set_palette(self, name: str = "Classic_10") -> None:
+    def set_palette(self, name: str = "Classic_10") -> Self:
         self.palette = load_palette(name)
+        return self
 
-    def set_line(self, size: int = 2, shape: str = "solid") -> None:
+    def set_line(self, size: int = 3, shape: str = "solid") -> Self:
         self.geom_line = {"size": size, "shape": shape}
+        return self
 
-    def set_textfont(self, size: int = 12, color="navy") -> None:
+    def set_textfont(self, size: int = 12, color="navy") -> Self:
         self.geom_textfont = {"size": size, "color": color}
+        return self
 
-    def execute(self) -> None:
+    def execute(self) -> Self:
         self.create_base()
+        return self
 
-    def create_base(self) -> None:
+    def create_base(self) -> Self:
         data = self.data
         group_var = self.group_var
         period_var = self.period_var
@@ -73,3 +78,4 @@ class PlyGroupsTims(Ply):
             )
         fig.update_layout(template="none")
         self.fig = fig
+        return self
