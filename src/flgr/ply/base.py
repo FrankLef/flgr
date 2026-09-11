@@ -1,4 +1,5 @@
 from typing import NamedTuple
+import plotly.graph_objects as go
 
 
 class GeomSpecs(NamedTuple):
@@ -10,21 +11,12 @@ class GeomSpecs(NamedTuple):
 class Ply:
     def __init__(self, name: str) -> None:
         self.name = name
-        self._title = ""
-        self._subtitle = ""
+        self.fig = go.Figure()
 
-    @property
-    def title(self) -> str:
-        return self._title
+    def titles(self, title: str, subtitle: str | None = None) -> None:
+        self.fig.update_layout(
+            title=dict(text=title, subtitle=dict(text=subtitle)),
+        )
 
-    @title.setter
-    def title(self, text: str) -> None:
-        self._title = text
-
-    @property
-    def subtitle(self) -> str:
-        return self._subtitle
-
-    @subtitle.setter
-    def subtitle(self, text: str) -> None:
-        self._subtitle = text
+    def template(self, templ: go.layout.Template) -> None:
+        self.fig.update_layout(template=templ)
