@@ -8,7 +8,7 @@ from ..colors.convert import convert_hex_to_rgba
 from .base import Ply
 
 
-class PlyGroupsTims(Ply):
+class PlyGroupsTrendTims(Ply):
     def __init__(
         self,
         name: str,
