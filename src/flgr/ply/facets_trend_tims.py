@@ -9,14 +9,14 @@ from ..colors.convert import convert_hex_to_rgba
 from .base import Ply
 
 
-class PlyFacetsTims(Ply):
+class PlyFacetsTrendTims(Ply):
     def __init__(
         self,
         name: str,
         data: pl.DataFrame,
         period_var: str,
         ybase_var: str,
-        yewm_var: str,
+        ytrend_var: str,
         group_var: str,
         label_base_var: str,
     ) -> None:
@@ -24,7 +24,7 @@ class PlyFacetsTims(Ply):
         self.data = data
         self.period_var = period_var
         self.ybase_var = ybase_var
-        self.yewm_var = yewm_var
+        self.ytrend_var = ytrend_var
         self.group_var = group_var
         self.label_base_var = label_base_var
         self.set_palette()
@@ -58,14 +58,13 @@ class PlyFacetsTims(Ply):
         group_var = self.group_var
         period_var = self.period_var
         ybase_var = self.ybase_var
-        yewm_var = self.yewm_var
+        ytrend_var = self.ytrend_var
         label_base_var = self.label_base_var
 
         groups = data[group_var].unique(maintain_order=True).to_list()
-        ngroups = len(groups)
 
         fig = make_subplots(
-            rows=ngroups,
+            rows=len(groups),
             cols=1,
             subplot_titles=groups,
             shared_xaxes=True,
@@ -73,13 +72,13 @@ class PlyFacetsTims(Ply):
         )
 
         color_cycle = itertools.cycle(self.palette)
-        for nrow, group in enumerate(groups, start=1):
+        for i, group in enumerate(groups, start=1):
             df = data.filter(pl.col(group_var).eq(group))
             a_color = convert_hex_to_rgba(next(color_cycle))
             fig.add_trace(
                 go.Scatter(
                     x=df[period_var],
-                    y=df[yewm_var],
+                    y=df[ytrend_var],
                     mode="lines",
                     line=dict(
                         color=a_color,
@@ -87,7 +86,7 @@ class PlyFacetsTims(Ply):
                         dash=self.geom_line["shape"],
                     ),
                 ),
-                row=nrow,
+                row=i,
                 col=1,
             )
             fig.add_trace(
@@ -105,7 +104,7 @@ class PlyFacetsTims(Ply):
                         symbol=self.geom_marker["shape"],
                     ),
                 ),
-                row=nrow,
+                row=i,
                 col=1,
             )
         fig.update_layout(template="none")
