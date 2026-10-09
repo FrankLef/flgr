@@ -2,13 +2,14 @@ import itertools
 from typing import Self
 import polars as pl
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from pypalettes import load_palette
 
 from ..colors.convert import convert_hex_to_rgba
 from .base import Ply
 
 
-class PlyGroupsTims(Ply):
+class PlyFacetsTims(Ply):
     def __init__(
         self,
         name: str,
@@ -61,8 +62,14 @@ class PlyGroupsTims(Ply):
 
         groups = data[group_var].unique(maintain_order=True).to_list()
         color_cycle = itertools.cycle(self.palette)
-        fig = go.Figure()
-        for group in groups:
+        fig = make_subplots(
+            rows=len(groups),
+            cols=1,
+            subplot_titles=groups,
+            shared_xaxes=True,
+            vertical_spacing=0.10,
+        )
+        for i, group in enumerate(groups, start=1):
             df = data.filter(pl.col(group_var).eq(group))
             a_color = convert_hex_to_rgba(next(color_cycle))
             if self.marker_var:
@@ -77,7 +84,9 @@ class PlyGroupsTims(Ply):
                             symbol=self.geom_marker["shape"],
                         ),
                         name=group,
-                    )
+                    ),
+                    row=i,
+                    col=1,
                 )
             if self.line_var:
                 fig.add_trace(
@@ -91,7 +100,9 @@ class PlyGroupsTims(Ply):
                             dash=self.geom_line["shape"],
                         ),
                         name=group,
-                    )
+                    ),
+                    row=i,
+                    col=1,
                 )
             if self.text_var:
                 if not self.textpos_var:
@@ -107,7 +118,9 @@ class PlyGroupsTims(Ply):
                         textfont_size=self.geom_textfont["size"],
                         textfont=dict(color=self.geom_textfont["color"]),
                         name=group,
-                    )
+                    ),
+                    row=i,
+                    col=1,
                 )
         fig.update_layout(template="none")
         self.fig = fig
